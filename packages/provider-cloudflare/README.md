@@ -6,7 +6,7 @@ This is the Node runtime package, separate from any existing Rust planning API.
 ## Install
 
 ```sh
-npm install @zixcel/provider-cloudflare@0.1.0
+npm install @zixcel/provider-cloudflare@0.1.1
 ```
 
 Registry publication is a separate gate; the initial candidate is not declared
