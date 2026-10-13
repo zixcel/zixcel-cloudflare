@@ -1,0 +1,170 @@
+{
+  "repository": "zixcel/zixcel-cloudflare",
+  "purpose": "Local administrator provider integration with bounded read/write operations",
+  "responsibility_boundary": "Own the named reusable integration/data mechanism. Product roles/UI and operational approvals stay with consumers; transport/custody reuse managed Crowsi components where capabilities fit. Planning-only APIs must remain clearly distinguished from implemented external operations.",
+  "packages": [
+    {
+      "manifest": "packages/provider-cloudflare/package.json",
+      "package": "@zixcel/provider-cloudflare",
+      "ecosystem": "npm",
+      "description": "cloudflare local administrator operations with one-use Crowsi authorization",
+      "interfaces": {
+        "exports": {
+          ".": {
+            "types": "./dist/index.d.mts",
+            "import": "./dist/index.mjs"
+          }
+        },
+        "bin": {},
+        "main": null,
+        "types": null
+      },
+      "declared_commands": {
+        "build": "tsc -p tsconfig.json",
+        "test": "npm run build && node --test test/*.test.mjs",
+        "prepack": "npm test"
+      }
+    }
+  ],
+  "schema_definitions": [],
+  "test_sources": [
+    "packages/provider-cloudflare/test/billing-summary.test.mjs",
+    "packages/provider-cloudflare/test/control.test.mjs",
+    "packages/provider-cloudflare/test/discovery.test.mjs"
+  ],
+  "example_sources": [
+    "playground/provider-operations/README.ja.md",
+    "playground/provider-operations/README.md",
+    "playground/provider-operations/demo.mjs"
+  ],
+  "workflow_definitions": [
+    {
+      "path": ".github/workflows/provider-control.yml",
+      "jobs": [
+        {
+          "job": "test",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": "Test isolated account read/write fixtures",
+              "run": "npm ci --ignore-scripts\nnpm test\nnode ../../.github/scripts/provider-consumer.mjs\nnpm pack --ignore-scripts\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/publish-provider.yml",
+      "jobs": [
+        {
+          "job": "prepare",
+          "condition": "github.ref == 'refs/heads/main' && github.event.repository.private == false",
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": "Require exact reviewed source without publication identity",
+              "run": "[[ \"$EXPECTED_SHA\" =~ ^[a-f0-9]{40}$ && \"$EXPECTED_SHA\" == \"$GITHUB_SHA\" ]]\ntest -z \"$ACTIONS_ID_TOKEN_REQUEST_TOKEN\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "npm install --global npm@12.2.0 --ignore-scripts",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify source and isolated candidate without OIDC",
+              "run": "npm ci --ignore-scripts\nnpm test\nnode ../../.github/scripts/provider-consumer.mjs\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Bind prepared archive",
+              "run": "node ../../.github/scripts/prepare-provider-artifact.mjs",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "condition": null
+            }
+          ]
+        },
+        {
+          "job": "publish",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": "Recheck reviewed source and OIDC context",
+              "run": "[[ \"$EXPECTED_SHA\" =~ ^[a-f0-9]{40}$ && \"$EXPECTED_SHA\" == \"$GITHUB_SHA\" ]]\ntest -n \"$ACTIONS_ID_TOKEN_REQUEST_URL\"\ntest -n \"$ACTIONS_ID_TOKEN_REQUEST_TOKEN\"\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "npm install --global npm@12.2.0 --ignore-scripts",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "condition": null
+            },
+            {
+              "name": "Publish only the exact prepared archive",
+              "run": "node ../../.github/scripts/publish-provider.mjs \"$RUNNER_TEMP/provider-release/$PREPARED_FILENAME\"",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence_policy": "Declarations and source paths are not proof of an executed acceptance. Exact CI head and result are recorded separately. No live accounts or production acceptance is inferred."
+}

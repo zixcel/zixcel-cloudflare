@@ -61,3 +61,15 @@ not implemented by this release. Do not substitute planning for observed rights,
 or estimates for final provider invoices.
 
 Apache-2.0. See LICENSE and NOTICE. Source: zixcel/zixcel-cloudflare.
+
+## Administrator discovery (new source catalog)
+
+`serviceProfile` describes the actual account scope, credential source, bounded operation list, and limits of permission/billing coverage. It contains no credentials, performs no login/request and reports `not-observed`; required permissions remain declarations. Discovery is a separate one-use reviewed read, not automatic account selection or authorization. Each cursor/page requires its own plan and grant. Source additions are not contained in the previously published package version until a new release is accepted.
+
+`token.account-verify` and `token.user-verify` are distinct owner selections. Active token state does not prove access to every resource; no token-type fallback is attempted.
+
+## Billing profile summaries (new source behavior)
+
+`billing.profile-read` projects a successful Cloudflare response to reviewed scalar summary fields. Payment nonces, validation codes and unreviewed fields are omitted; raw secret-bearing profile bytes or their hash are not returned. An HTTP 200 envelope with `success:false` or malformed result is rejected. The summary remains configuration information, not invoice/usage data or authorization to pay/change a billing profile.
+
+Primary reference: [Cloudflare billing profile](https://developers.cloudflare.com/api/resources/billing/subresources/profiles/methods/get/). The adapter reuses bounded Crowsi HTTP and the existing one-use approval flow.

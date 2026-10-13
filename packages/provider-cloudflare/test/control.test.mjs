@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createControl, operations } from '../dist/index.mjs'
 const account = { provider: "cloudflare", subject: 'synthetic-owner', account: 'synthetic-account' }
-const samples = {"account.read": {}, "account.set-name": {"name": "Isolated test account"}, "billing.profile-read": {}}
+const samples = {"account.read":{},"account.set-name":{"name":"Isolated test account"},"billing.profile-read":{},"accounts.list":{"page":1},"token.account-verify":{},"token.user-verify":{}}
 const token = 'synthetic-bearer-not-a-real-account'
 function fixture() {
   const requests = []
@@ -12,6 +12,7 @@ function fixture() {
     assert.equal(init.headers.Authorization, `Bearer ${token}`)
     requests.push({ url, method: init.method, body: init.body })
     if (status !== 200) return new Response('rejected', { status })
+    if (new URL(url).pathname.endsWith('/billing/profile')) return new Response(JSON.stringify({ success: true, result: { company: 'Synthetic company', payment_nonce: 'synthetic-private-payment-nonce', validation_code: 'synthetic-validation' } }))
     if (init.method !== 'GET' && !url.includes('testIamPermissions')) state = JSON.parse(init.body)
     return new Response(JSON.stringify(state), { status: 200 })
   })
