@@ -1,6 +1,6 @@
 # OSS source contract: zixcel/zixcel-cloudflare
 
-Local administrator provider integration with bounded read/write operations
+Owner-approved Cloudflare account read/write, token-state discovery and sanitized billing profile summaries.
 
 ## Responsibility boundary
 
