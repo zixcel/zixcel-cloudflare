@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "repository": "zixcel/zixcel-cloudflare",
+  "defaultBranch": "main",
+  "requiredWorkflows": [
+    "provider-control.yml"
+  ],
+  "packages": [
+    {
+      "ecosystem": "npm",
+      "manifest": "packages/provider-cloudflare/package.json",
+      "name": "@zixcel/provider-cloudflare",
+      "installDirectory": "packages/provider-cloudflare"
+    }
+  ]
+}
