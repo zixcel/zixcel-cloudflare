@@ -1,0 +1,19 @@
+{
+  "operation": "accounts.list",
+  "arguments": {},
+  "url": "https://api.cloudflare.com/client/v4/accounts?page=1&per_page=20",
+  "raw": {
+    "success": true,
+    "result": [
+      {
+        "id": "00000000000000000000000000000000",
+        "name": "Synthetic account",
+        "type": "standard"
+      }
+    ],
+    "result_info": {
+      "page": 1,
+      "total_pages": 2
+    }
+  }
+}

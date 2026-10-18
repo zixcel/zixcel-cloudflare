@@ -1,0 +1,16 @@
+{
+  "schema": "zix-api-review/v1",
+  "source_sha256": "98f1b4308a94c314b147fc5c468b346ab16a6fd3388f950e4547a6311fb4682f",
+  "format": "openapi",
+  "operations": [
+    {
+      "id": "accounts-account-details",
+      "binding": null
+    },
+    {
+      "id": "accounts-list-accounts",
+      "binding": null
+    }
+  ],
+  "source_uri": "https://raw.githubusercontent.com/cloudflare/api-schemas/e91e65be9898b6bc400231f36ce77e8e7d5a02ab/openapi.json"
+}
