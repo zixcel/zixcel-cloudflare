@@ -1,0 +1,97 @@
+{
+  "schema": "zix-native-policy/v1",
+  "namespace": "cloudflare",
+  "package": "zixcel-cloudflare-cli",
+  "version": "0.1.0",
+  "credential_environment": "ZIX_CLOUDFLARE_ACCESS_TOKEN",
+  "origin": "https://api.cloudflare.com",
+  "base_path": "/client/v4",
+  "routes_sha256": "adfbc10afef4d1aa4a8c5b8dd91c3a911c372139f6d1819b2b4f1ec650f9bb4a",
+  "operations": [
+    {
+      "api": "accounts-account-details",
+      "command": {
+        "id": "account.read",
+        "words": [
+          "accounts",
+          "get"
+        ],
+        "effect": "read",
+        "description": "Read cloudflare accounts get.",
+        "required_permissions": [
+          "Account Settings Read"
+        ],
+        "arguments": [
+          {
+            "name": "account",
+            "required": true,
+            "maximum": 32
+          }
+        ]
+      },
+      "path_arguments": {
+        "account_id": "account"
+      },
+      "argument_rules": {
+        "account": "hex32"
+      },
+      "query": {},
+      "headers": {},
+      "identity": [
+        {
+          "pointer": "/result/id",
+          "expected": "{account}"
+        }
+      ],
+      "projection": {
+        "pointer": "/result",
+        "collection": false,
+        "fields": {
+          "id": "/id",
+          "name": "/name",
+          "type": "/type"
+        },
+        "required": [
+          "id"
+        ],
+        "success_pointer": "/success"
+      }
+    },
+    {
+      "api": "accounts-list-accounts",
+      "command": {
+        "id": "accounts.list",
+        "words": [
+          "accounts",
+          "list"
+        ],
+        "effect": "read",
+        "description": "Read cloudflare accounts list.",
+        "required_permissions": [
+          "Account Settings Read"
+        ],
+        "arguments": []
+      },
+      "path_arguments": {},
+      "argument_rules": {},
+      "query": {
+        "page": "1",
+        "per_page": "20"
+      },
+      "headers": {},
+      "identity": [],
+      "projection": {
+        "pointer": "/result",
+        "collection": true,
+        "fields": {
+          "id": "/id",
+          "name": "/name"
+        },
+        "required": [
+          "id"
+        ],
+        "success_pointer": "/success"
+      }
+    }
+  ]
+}

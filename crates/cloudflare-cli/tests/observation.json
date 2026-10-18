@@ -1,0 +1,15 @@
+{
+  "arguments": {
+    "account": "00000000000000000000000000000001"
+  },
+  "url": "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000001",
+  "raw": {
+    "success": true,
+    "result": {
+      "id": "00000000000000000000000000000001",
+      "name": "Synthetic account",
+      "type": "standard",
+      "unselected-private-field": "not selected"
+    }
+  }
+}
