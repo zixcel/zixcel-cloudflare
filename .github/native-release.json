@@ -1,0 +1,6 @@
+{
+  "repository": "zixcel/zixcel-cloudflare",
+  "package": "zixcel-cloudflare-cli",
+  "tag_prefix": "native/cloudflare/v",
+  "workflow": "native-provider.yml"
+}
