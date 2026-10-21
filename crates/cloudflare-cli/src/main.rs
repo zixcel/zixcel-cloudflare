@@ -1,7 +1,6 @@
 fn main() -> std::process::ExitCode {
-    zix_native_provider::entry(
-        include_bytes!("../api/routes.json"),
-        include_bytes!("../api/policy.json"),
-        env!("CARGO_PKG_VERSION"),
-    )
+    match zixcel_cloudflare_cli::manifest() {
+        Ok(manifest) => zix_native_provider::serve(manifest, zixcel_cloudflare_cli::execute),
+        Err(_) => std::process::ExitCode::from(2),
+    }
 }

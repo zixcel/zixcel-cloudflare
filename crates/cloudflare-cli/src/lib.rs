@@ -1,3 +1,5 @@
+mod observer;
+pub use observer::{execute, manifest};
 pub fn provider() -> zix_native_provider::Result<zix_native_provider::Provider> {
     zix_native_provider::Provider::load(
         include_bytes!("../api/routes.json"),

@@ -22,6 +22,9 @@ Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
 
 ## Native Zix provider
 
+[Lifecycle and DNS evidence](docs/lifecycle-observations.md) covers bounded
+Workers/Pages/DNS/security observations and explicit incomplete states.
+
 [Reviewed Rust adapter](crates/cloudflare-cli/README.md) adds scoped read commands
 through the common `zix` protocol. Source/development tests and native distribution
 are separate; no real credentials or cloud operations are used by CI.
