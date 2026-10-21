@@ -80,6 +80,18 @@ fn postcondition_receipts_are_scoped_read_evidence_not_authority() {
     assert!(
         receipt(
             &report,
+            "web_analytics",
+            "absent",
+            "ended",
+            &"a".repeat(40),
+            &"b".repeat(64),
+            NOW
+        )
+        .is_err()
+    );
+    assert!(
+        receipt(
+            &report,
             "workers",
             "absent",
             "created",

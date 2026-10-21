@@ -60,7 +60,8 @@ pub fn receipt(
     now: u64,
 ) -> Result<Value, &'static str> {
     report.verify(now)?;
-    if !["created", "ended"].contains(&event)
+    if !["workers", "custom_domains", "pages", "zones"].contains(&component)
+        || !["created", "ended"].contains(&event)
         || identity.is_empty()
         || identity.len() > 253
         || source.len() != 40
