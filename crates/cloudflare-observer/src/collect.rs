@@ -11,13 +11,12 @@ pub fn observe(http: &mut impl Transport, scope: Scope, now: u64) -> Result<Repo
             &format!("/zones/{}", zone.id),
             &["id", "name", "status", "account_id", "name_servers"],
         );
-        if let Some(data) = details.supported() {
-            if data["id"] != zone.id
+        if let Some(data) = details.supported()
+            && (data["id"] != zone.id
                 || data["name"] != zone.domain
-                || data["account_id"] != scope.account
-            {
-                return Err("zone_scope_mismatch");
-            }
+                || data["account_id"] != scope.account)
+        {
+            return Err("zone_scope_mismatch");
         }
         let authorized = details.state == State::Supported;
         observations.insert("zone".into(), details);

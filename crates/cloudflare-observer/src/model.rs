@@ -55,8 +55,8 @@ impl Scope {
         {
             return Err("invalid_scope");
         }
-        if let Some(zone) = &self.zone {
-            if !crate::valid_id(&zone.id)
+        if let Some(zone) = &self.zone
+            && (!crate::valid_id(&zone.id)
                 || zone.domain.len() > 253
                 || !zone.domain.contains('.')
                 || zone.domain.split('.').any(|label| {
@@ -67,10 +67,9 @@ impl Scope {
                         || !label
                             .bytes()
                             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
-                })
-            {
-                return Err("invalid_zone_scope");
-            }
+                }))
+        {
+            return Err("invalid_zone_scope");
         }
         Ok(())
     }
