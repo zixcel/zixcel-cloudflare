@@ -1,5 +1,5 @@
 use crate::{Observation, State, Transport, project, transport};
-use serde_json::{Value, json};
+use serde_json::json;
 use std::collections::BTreeSet;
 pub(crate) fn list(
     http: &mut impl Transport,

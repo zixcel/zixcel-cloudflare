@@ -42,8 +42,8 @@ pub fn digest(value: &serde_json::Value) -> String {
             other => other.clone(),
         }
     }
-    format!(
-        "{:x}",
-        Sha256::digest(canonical(value).to_string().as_bytes())
-    )
+    Sha256::digest(canonical(value).to_string().as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
 }
