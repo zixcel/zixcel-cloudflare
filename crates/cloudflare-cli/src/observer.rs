@@ -2,7 +2,7 @@ use serde_json::{Value, json};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zeroize::Zeroizing;
 use zix_native_provider::{Error, Failure, Manifest, Request, validate_request};
-use zixcel_cloudflare_observer::{LiveRead, Scope, Transport, ZoneScope};
+use zixcel_cloudflare_observer::{LiveRead, ReadError, Scope, Transport, ZoneScope};
 
 pub fn manifest() -> zix_native_provider::Result<Manifest> {
     let mut m = crate::provider()?.manifest().clone();
@@ -101,7 +101,14 @@ pub fn execute(request: &Request) -> Result<Value, Failure> {
         .url
         .strip_prefix("https://api.cloudflare.com/client/v4")
         .ok_or(Error("origin_mismatch"))?;
-    let value = http.get(path).map_err(|_| Error("provider_http_failed"))?;
+    let value = http.get(path).map_err(|e| match e {
+        ReadError::Http(status) => Failure {
+            code: "provider_http_failed",
+            http_status: Some(status),
+        },
+        ReadError::Budget => Failure::from(Error("provider_response_limit")),
+        _ => Failure::from(Error("provider_transport_failed")),
+    })?;
     provider
         .project(
             request,
