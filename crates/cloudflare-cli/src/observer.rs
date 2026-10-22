@@ -1,40 +1,10 @@
-use serde_json::{Value, json};
+use crate::manifest;
+use serde_json::Value;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zeroize::Zeroizing;
-use zix_native_provider::{Error, Failure, Manifest, Request, validate_request};
+use zix_native_provider::{Error, Failure, Request, validate_request};
 use zixcel_cloudflare_observer::{LiveRead, ReadError, Scope, Transport, ZoneScope};
 
-pub fn manifest() -> zix_native_provider::Result<Manifest> {
-    let mut m = crate::provider()?.manifest().clone();
-    for (id, words, arguments) in [
-        (
-            "lifecycle.observe",
-            vec!["lifecycle", "observe"],
-            vec!["account"],
-        ),
-        (
-            "dns.audit",
-            vec!["dns", "audit"],
-            vec!["account", "zone", "domain"],
-        ),
-    ] {
-        let mut args: Vec<Value> = arguments
-            .into_iter()
-            .map(|name| json!({"name":name,"required":true,"maximum":253}))
-            .collect();
-        args.push(json!({"name":"workers","required":false,"maximum":810}));
-        m.commands.push(
-            serde_json::from_value(json!({"id":id,"words":words,"effect":"read",
-            "description":"Bounded Cloudflare observations; denied/partial are not safe states.",
-            "required_permissions":["Read access to explicitly selected account and optional zone"],
-            "arguments":args}))
-            .map_err(|_| Error("invalid_observer_manifest"))?,
-        );
-    }
-    m.timeout_ms = 40000;
-    m.validate()?;
-    Ok(m)
-}
 fn scope(request: &Request) -> Result<Scope, Failure> {
     let arg = |name: &str| {
         request
@@ -75,17 +45,23 @@ pub fn execute(request: &Request) -> Result<Value, Failure> {
         None
     };
     let provider = crate::provider().map_err(Failure::from)?;
+    let legacy = crate::legacy::request(&provider, request);
     let prepared = if scoped.is_none() {
-        Some(provider.prepare(request).map_err(Failure::from)?)
+        Some(provider.prepare(&legacy).map_err(Failure::from)?)
     } else {
         None
     };
     let token = Zeroizing::new(
         std::env::var("ZIX_CLOUDFLARE_ACCESS_TOKEN").map_err(|_| Error("credential_missing"))?,
     );
+    let timeout = if scoped.is_some() {
+        request.limits.timeout_ms
+    } else {
+        legacy.limits.timeout_ms
+    };
     let mut http = LiveRead::new(
         &token,
-        Duration::from_millis(request.limits.timeout_ms.saturating_sub(20).max(50)),
+        Duration::from_millis(timeout.saturating_sub(20).max(50)),
     )
     .map_err(|_| Error("transport_setup"))?;
     if let Some(scope) = scoped {
@@ -111,7 +87,7 @@ pub fn execute(request: &Request) -> Result<Value, Failure> {
     })?;
     provider
         .project(
-            request,
+            &legacy,
             &serde_json::to_vec(&value).map_err(|_| Error("response_encoding"))?,
         )
         .map_err(Failure::from)
