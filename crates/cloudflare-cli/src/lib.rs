@@ -1,5 +1,8 @@
+mod catalog;
+mod legacy;
 mod observer;
-pub use observer::{execute, manifest};
+pub use catalog::manifest;
+pub use observer::execute;
 pub fn provider() -> zix_native_provider::Result<zix_native_provider::Provider> {
     zix_native_provider::Provider::load(
         include_bytes!("../api/routes.json"),
