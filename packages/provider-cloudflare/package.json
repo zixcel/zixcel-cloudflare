@@ -1,22 +1,27 @@
 {
   "name": "@zixcel/provider-cloudflare",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "license": "Apache-2.0",
   "description": "cloudflare local administrator operations with one-use Crowsi authorization",
   "engines": {
-    "node": ">=24.15.0 <25"
+    "node": ">=24.22.1 <25"
   },
   "files": [
     "dist",
     "README.md",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "LICENSE.coela-edge"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./edge-verification": {
+      "types": "./dist/edge-verification.d.mts",
+      "import": "./dist/edge-verification.mjs"
     }
   },
   "repository": {
@@ -30,7 +35,7 @@
     "provenance": true
   },
   "dependencies": {
-    "@crowsi/provider-http-transport": "0.11.2"
+    "@crowsi/provider-http-transport": "0.12.1"
   },
   "devDependencies": {
     "@types/node": "24.19.2",

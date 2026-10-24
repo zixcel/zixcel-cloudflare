@@ -1,2 +1,6 @@
 Zixcel cloudflare integration
 Copyright 2026 Zixcel contributors
+
+The edge-verification module derives from Coela portfolio's pinned Cloudflare
+HTML verification, Copyright (c) 2026 Coela, under the MIT license reproduced in
+LICENSE.coela-edge. It performs no transport, authentication, deployment or grant.
