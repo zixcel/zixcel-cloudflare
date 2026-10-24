@@ -23,12 +23,15 @@ try {
  copyFileSync(resolve(root, '../../playground/provider-operations/demo.mjs'), join(project, 'demo.mjs'))
  writeFileSync(join(project, 'consumer.mts'), `import { createControl } from '${manifest.name}';\nconst control = createControl({provider:'synthetic',subject:'owner',account:'account'},{acquire:async()=> 'synthetic'}, async()=>new Response('{}'));\ncontrol.prepare('account.read', {});\n`)
  run('node', ['node_modules/typescript/bin/tsc', '--noEmit', '--strict', '--skipLibCheck', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', 'consumer.mts'])
+ const exportsByFile = new Map(Object.entries(manifest.exports).map(([key, value]) =>
+  [value.import.replace('./dist/', ''), key === '.' ? manifest.name : manifest.name + key.slice(1)]))
  const publicTests = ['control.test.mjs']
  for (const name of readdirSync('test').filter(name => name.endsWith('.test.mjs') && name !== 'control.test.mjs')) {
   const sourceTest = readFileSync(join('test', name), 'utf8')
   const imports = [...sourceTest.matchAll(/['"]\.\.\/dist\/([^'"]+)['"]/g)]
-  if (!imports.length || imports.some(match => match[1] !== 'index.mjs')) continue
-  writeFileSync(join(project, name), sourceTest.replaceAll("'../dist/index.mjs'", JSON.stringify(manifest.name)))
+  if (!imports.length || imports.some(match => !exportsByFile.has(match[1]))) continue
+  writeFileSync(join(project, name), sourceTest.replace(/(['"])\.\.\/dist\/([^'"]+)\1/g,
+   (_, _quote, file) => JSON.stringify(exportsByFile.get(file))))
   publicTests.push(name)
  }
  process.stdout.write(run('node', ['--test', ...publicTests]))

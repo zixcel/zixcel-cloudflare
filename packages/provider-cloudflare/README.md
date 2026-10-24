@@ -73,3 +73,14 @@ Apache-2.0. See LICENSE and NOTICE. Source: zixcel/zixcel-cloudflare.
 `billing.profile-read` projects a successful Cloudflare response to reviewed scalar summary fields. Payment nonces, validation codes and unreviewed fields are omitted; raw secret-bearing profile bytes or their hash are not returned. An HTTP 200 envelope with `success:false` or malformed result is rejected. The summary remains configuration information, not invoice/usage data or authorization to pay/change a billing profile.
 
 Primary reference: [Cloudflare billing profile](https://developers.cloudflare.com/api/resources/billing/subresources/profiles/methods/get/). The adapter reuses bounded Crowsi HTTP and the existing one-use approval flow.
+
+## Pinned edge verification (0.2.0)
+
+The separate `@zixcel/provider-cloudflare/edge-verification` export has no provider
+transport or credential imports. `originHtml(bytes, pins)` removes at most one
+exact full-tag hash per declared analytics/jsd role at the body end. Only the JSD
+ray ID and a canonical base64 numeric timestamp are normalized. Unknown/duplicate
+scripts, moved tags and changed body bytes must still fail the caller's exact
+artifact hash check. This is not a signature/trust verdict, sanitization, script
+execution or permission to weaken Cloudflare protection. Pins are explicit owner
+review inputs; never learn/approve them automatically from live responses.
