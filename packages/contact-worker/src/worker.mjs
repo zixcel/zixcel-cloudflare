@@ -78,4 +78,3 @@ export async function handle(request,env,externalFetch=fetch){
   return reply(202,'accepted_by_provider',origin)
  }catch{return reply(503,'submission_unavailable',origin)}
 }
-
