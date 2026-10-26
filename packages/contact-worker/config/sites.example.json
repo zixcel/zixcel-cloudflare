@@ -1,0 +1,19 @@
+[
+ {
+  "siteKey":"hat-corporate",
+  "origin":"https://hat-tech.co.jp",
+  "hostname":"hat-tech.co.jp",
+  "to":"contact@hat-tech.co.jp",
+  "from":"forms@notify.example.com",
+  "policyVersion":"REVIEWED-POLICY-ID@FULL-GIT-COMMIT",
+  "enabled":false,
+  "network":{
+   "allowedCidrs":[],
+   "deniedCidrs":["192.0.2.0/24","2001:db8::/32"],
+   "allowedCountries":[],
+   "deniedCountries":[],
+   "deniedRegions":[],
+   "deniedAsns":[]
+  }
+ }
+]

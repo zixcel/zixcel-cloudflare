@@ -1,0 +1,11 @@
+{
+  "name": "@zixcel/contact-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Fail-closed Cloudflare contact submission adapter; no administrator credentials",
+  "scripts": {"test": "node --test test/*.test.mjs", "typecheck": "tsc --noEmit"},
+  "dependencies": {"ipaddr.js": "2.2.0"},
+  "devDependencies": {"typescript": "7.0.2"}
+}
