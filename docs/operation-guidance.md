@@ -1,7 +1,7 @@
 # Cloudflare operation guidance
 
 Use **MEANING → REQUIREMENTS → EVIDENCE → NEXT** before a remote request.
-Requires Zix CLI 0.6.0 and this provider's guided protocol v2 release.
+Requires Zix CLI 0.7.0 and this provider's guided protocol v2 release.
 
 ```sh
 zix prompt cloudflare
@@ -33,3 +33,15 @@ request if zone identity is denied or mismatched. It does not read account
 Workers, Pages or application security settings. `lifecycle.observe` remains an
 explicit broader inventory; a partial response is evidence of unresolved
 resources, not a request to broaden token permissions automatically.
+
+## Small-context discovery
+
+Every registered operation has an explicit source-owned definition. Missing coverage is a validation error.
+
+```sh
+zix capabilities --compact --format json
+zix capabilities --namespace cloudflare --compact --format json
+zix describe cloudflare --operation dns.audit --compact --format json
+```
+
+Pass known resource selectors with `--argument NAME=VALUE`. Missing conditional inputs stop before credential resolution or provider requests. Account inventory declares its account permission separately from the narrow DNS audit.
