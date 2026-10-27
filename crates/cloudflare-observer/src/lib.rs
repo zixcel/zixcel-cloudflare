@@ -2,6 +2,8 @@
 //! Vendor read projections only. No mutation, scheduler, script download or secret lookup.
 mod account;
 mod collect;
+mod dns;
+pub use dns::observe_dns;
 pub mod lifecycle;
 mod model;
 mod paging;

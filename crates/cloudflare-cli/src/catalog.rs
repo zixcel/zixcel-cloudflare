@@ -19,7 +19,9 @@ pub fn manifest() -> zix_native_provider::Result<Manifest> {
             .into_iter()
             .map(|name| json!({"name":name,"required":true,"maximum":253}))
             .collect();
-        args.push(json!({"name":"workers","required":false,"maximum":810}));
+        if id == "lifecycle.observe" {
+            args.push(json!({"name":"workers","required":false,"maximum":810}));
+        }
         m.commands.push(
             serde_json::from_value(json!({"id":id,"words":words,"effect":"read",
             "description":"Bounded Cloudflare observations; denied/partial are not safe states.",
@@ -29,6 +31,8 @@ pub fn manifest() -> zix_native_provider::Result<Manifest> {
         );
     }
     m.timeout_ms = 40000;
+    m.protocol = "zix-provider/v2".into();
+    zix_native_provider::guidance::decorate(&mut m, include_bytes!("../api/guidance.json"))?;
     m.validate()?;
     Ok(m)
 }

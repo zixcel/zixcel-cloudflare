@@ -5,8 +5,8 @@ decoding. Domain consumers reconcile its evidence with registrar settings and
 actual DNS delegation; neither provider infers ownership from hostnames.
 
 ```sh
-zix cloudflare lifecycle observe --account ACCOUNT_ID
-zix cloudflare dns audit --account ACCOUNT_ID --zone ZONE_ID --domain example.org --workers website
+zix cloudflare lifecycle observe --account ACCOUNT_ID --workers website
+zix cloudflare dns audit --account ACCOUNT_ID --zone ZONE_ID --domain example.org
 ```
 
 An existing read token is supplied as `ZIX_CLOUDFLARE_ACCESS_TOKEN` in the process
