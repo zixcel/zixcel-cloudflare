@@ -62,7 +62,8 @@ impl Transport for LiveRead {
 pub(crate) fn failed(error: ReadError) -> crate::Observation {
     use crate::{Observation, State};
     let (state, reason) = match error {
-        ReadError::Http(401 | 403) => (State::Denied, "permission_denied"),
+        ReadError::Http(401) => (State::Denied, "authentication_rejected"),
+        ReadError::Http(403) => (State::Denied, "permission_denied"),
         ReadError::Http(404) => (State::Unobserved, "not_found_or_hidden"),
         ReadError::Timeout => (State::Unobserved, "timeout"),
         ReadError::Budget => (State::Partial, "request_or_body_budget"),

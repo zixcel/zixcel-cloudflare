@@ -9,10 +9,10 @@ fn invoke(operation: &str, timeout: u64) -> std::process::Output {
     } else {
         json!({})
     };
-    let request = json!({"schema":"zix-provider/v1","id":"0".repeat(32),"operation":operation,
+    let request = json!({"schema":"zix-provider/v2","id":"0".repeat(32),"operation":operation,
         "arguments":arguments,"limits":{"timeout_ms":timeout,"maximum_response_bytes":131072}});
     let mut child = Command::new(env!("CARGO_BIN_EXE_zix-cloudflare"))
-        .arg("--zix-provider-v1")
+        .arg("--zix-provider-v2")
         .env_clear()
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())

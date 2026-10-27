@@ -1,6 +1,16 @@
 fn main() -> std::process::ExitCode {
-    match zixcel_cloudflare_cli::manifest() {
-        Ok(manifest) => zix_native_provider::serve(manifest, zixcel_cloudflare_cli::execute),
-        Err(_) => std::process::ExitCode::from(2),
+    let result = (|| {
+        let manifest = zixcel_cloudflare_cli::manifest()?;
+        let catalog = zixcel_cloudflare_cli::guidance()?;
+        Ok::<_, zix_native_provider::Error>((manifest, catalog))
+    })();
+    match result {
+        Ok((manifest, catalog)) => {
+            zix_native_provider::serve_guided(manifest, catalog, zixcel_cloudflare_cli::execute)
+        }
+        Err(error) => {
+            eprintln!("{{\"error\":\"{}\"}}", error.0);
+            std::process::ExitCode::from(2)
+        }
     }
 }
