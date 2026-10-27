@@ -1,0 +1,142 @@
+[
+  {
+    "operation": "dns.audit",
+    "selectors": {},
+    "intent": "audit_cloudflare_dns_zone",
+    "keywords": [
+      "CLOUDFLARE",
+      "DNS",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "target_scope",
+        "value": "explicit account and zone; permissions limited to selected resources",
+        "subject": "provider_resource"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "Zone Read and DNS Read for selected zone",
+        "subject": "operation"
+      },
+      {
+        "kind": "context",
+        "value": "API token denial and HTTP application protection have different causes",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
+      {
+        "namespace": "domain",
+        "operation": "dns.delegation",
+        "purpose": "establish_authoritative_dns",
+        "arguments": {},
+        "on": [
+          "context",
+          "incomplete"
+        ]
+      },
+      {
+        "namespace": "domain",
+        "operation": "dns.records.plan",
+        "purpose": "prepare_dns_change_after_zone_verification",
+        "arguments": {},
+        "on": [
+          "observed"
+        ],
+        "requires_context": {
+          "authoritative_dns": "verified",
+          "dns_profile": "reviewed"
+        }
+      },
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/reference/permissions/"
+    ]
+  },
+  {
+    "operation": "lifecycle.observe",
+    "selectors": {},
+    "intent": "read_cloudflare_lifecycle",
+    "keywords": [
+      "CLOUDFLARE",
+      "LIFECYCLE",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "target_scope",
+        "value": "explicit account and zone; permissions limited to selected resources",
+        "subject": "provider_resource"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "Read permissions for zone DNS/settings/security and account Workers/Pages/Web Analytics/Turnstile inventory; unresolved resources stay incomplete",
+        "subject": "operation"
+      },
+      {
+        "kind": "context",
+        "value": "API token denial and HTTP application protection have different causes",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
+      {
+        "namespace": "domain",
+        "operation": "dns.delegation",
+        "purpose": "establish_authoritative_dns",
+        "arguments": {},
+        "on": [
+          "context",
+          "incomplete"
+        ]
+      },
+      {
+        "namespace": "domain",
+        "operation": "dns.records.plan",
+        "purpose": "prepare_dns_change_after_zone_verification",
+        "arguments": {},
+        "on": [
+          "observed"
+        ],
+        "requires_context": {
+          "authoritative_dns": "verified",
+          "dns_profile": "reviewed"
+        }
+      },
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/reference/permissions/"
+    ]
+  }
+]

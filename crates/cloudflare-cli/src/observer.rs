@@ -69,7 +69,12 @@ pub fn execute(request: &Request) -> Result<Value, Failure> {
             .duration_since(UNIX_EPOCH)
             .map_err(|_| Error("clock_unavailable"))?
             .as_secs();
-        let report = zixcel_cloudflare_observer::observe(&mut http, scope, now).map_err(Error)?;
+        let report = if request.operation == "dns.audit" {
+            zixcel_cloudflare_observer::observe_dns(&mut http, scope, now)
+        } else {
+            zixcel_cloudflare_observer::observe(&mut http, scope, now)
+        }
+        .map_err(Error)?;
         return serde_json::to_value(report).map_err(|_| Failure::from(Error("response_encoding")));
     }
     let plan = prepared.ok_or(Error("operation_missing"))?;

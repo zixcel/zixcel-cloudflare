@@ -1,5 +1,8 @@
 # zixcel-cloudflare
 
+Local administration: `zix cloudflare --help`. Inspect intent, prerequisites and related
+tools before a remote request: [operation guidance](docs/operation-guidance.md).
+
 Owner-approved Cloudflare account read/write, token-state discovery and sanitized billing profile summaries.
 
 See [the Node package](packages/provider-cloudflare/README.md) for bounded
@@ -28,3 +31,5 @@ Workers/Pages/DNS/security observations and explicit incomplete states.
 [Reviewed Rust adapter](crates/cloudflare-cli/README.md) adds scoped read commands
 through the common `zix` protocol. Source/development tests and native distribution
 are separate; no real credentials or cloud operations are used by CI.
+
+Operation requirements and related-tool handoffs: [LLM guidance](docs/operation-guidance.md).

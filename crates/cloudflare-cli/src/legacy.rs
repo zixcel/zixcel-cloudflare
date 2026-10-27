@@ -3,6 +3,8 @@ use zix_native_provider::{Provider, Request};
 // The combined host admits longer audits, while legacy routes retain their own ceiling.
 pub(crate) fn request(provider: &Provider, original: &Request) -> Request {
     let mut request = original.clone();
+    request.schema = provider.manifest().protocol.clone();
+    request.binding = None;
     request.limits.timeout_ms = request
         .limits
         .timeout_ms
@@ -24,7 +26,7 @@ mod tests {
             } else {
                 json!({})
             };
-            let original: Request = serde_json::from_value(json!({"schema":"zix-provider/v1", "id":"0".repeat(32),
+            let original: Request = serde_json::from_value(json!({"schema":"zix-provider/v2", "id":"0".repeat(32),
                 "operation":operation,"arguments":arguments,"limits":{"timeout_ms":manifest.timeout_ms,"maximum_response_bytes":131072}})).unwrap();
             zix_native_provider::validate_request(&manifest, &original).unwrap();
             let bounded = request(&provider, &original);

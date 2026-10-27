@@ -10,3 +10,8 @@ pub fn provider() -> zix_native_provider::Result<zix_native_provider::Provider> 
         env!("CARGO_PKG_VERSION"),
     )
 }
+
+pub fn guidance() -> zix_native_provider::Result<zix_native_provider::GuidanceCatalog> {
+    let manifest = manifest()?;
+    zix_native_provider::guidance::catalog(&manifest, include_bytes!("../api/guidance.json"))
+}

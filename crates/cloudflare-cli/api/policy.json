@@ -2,7 +2,7 @@
   "schema": "zix-native-policy/v1",
   "namespace": "cloudflare",
   "package": "zixcel-cloudflare-cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "credential_environment": "ZIX_CLOUDFLARE_ACCESS_TOKEN",
   "origin": "https://api.cloudflare.com",
   "base_path": "/client/v4",
