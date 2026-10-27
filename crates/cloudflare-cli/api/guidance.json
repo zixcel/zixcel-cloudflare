@@ -86,7 +86,7 @@
       },
       {
         "kind": "target_scope",
-        "value": "explicit account and zone; permissions limited to selected resources",
+        "value": "Explicit account; optional zone must match selected account and domain",
         "subject": "provider_resource"
       },
       {
@@ -124,6 +124,90 @@
           "dns_profile": "reviewed"
         }
       },
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/reference/permissions/"
+    ]
+  },
+  {
+    "operation": "account.read",
+    "selectors": {},
+    "intent": "read_selected_cloudflare_account",
+    "keywords": [
+      "CLOUDFLARE",
+      "ACCOUNT",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "Account Settings Read",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "target_scope",
+        "value": "Selected account, or accounts visible to this credential; visibility is not account ownership",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/reference/permissions/"
+    ]
+  },
+  {
+    "operation": "accounts.list",
+    "selectors": {},
+    "intent": "list_credential_visible_cloudflare_accounts",
+    "keywords": [
+      "CLOUDFLARE",
+      "ACCOUNT",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "Account Settings Read",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "target_scope",
+        "value": "Selected account, or accounts visible to this credential; visibility is not account ownership",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
       {
         "namespace": "credential",
         "operation": "help",
