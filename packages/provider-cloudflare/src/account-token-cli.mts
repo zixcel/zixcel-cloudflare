@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Local-only candidate provisioning. Never accepts credentials in flags or files. */
-import { constants, openSync, fstatSync, readFileSync, closeSync } from 'node:fs'
-import { isAbsolute } from 'node:path'
+import { constants, openSync, fstatSync, readFileSync, closeSync, lstatSync, writeFileSync } from 'node:fs'
+import { isAbsolute, dirname } from 'node:path'
 import { provisionAccountToken, ProvisioningError } from './account-token-provisioning.mjs'
 import { githubEnvironmentSecretSink } from './github-environment-secret.mjs'
 
@@ -44,9 +44,43 @@ async function secretFromTerminal(): Promise<string> {
   })
 }
 
+async function inspectAccount(accountId: string, credential: string, output: string): Promise<number> {
+  if (!/^[a-f0-9]{32}$/.test(accountId) || !isAbsolute(output)) throw new Error('invalid-inspection')
+  const dir = lstatSync(dirname(output))
+  if (!dir.isDirectory() || dir.isSymbolicLink() || dir.uid !== process.getuid?.() || (dir.mode & 0o077) !== 0) throw new Error('invalid-output-directory')
+  const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/tokens`
+  const get = async (suffix: string) => {
+    const response = await fetch(url + suffix, { headers: { Authorization: `Bearer ${credential}` }, redirect: 'error', signal: AbortSignal.timeout(30000) })
+    if (!response.ok) throw new Error('inspection-rejected')
+    const body = await response.text()
+    if (Buffer.byteLength(body) > 2097152) throw new Error('inspection-response-too-large')
+    const payload = JSON.parse(body)
+    if (payload?.success !== true) throw new Error('inspection-rejected')
+    return payload.result
+  }
+  const verified = await get('/verify')
+  if (verified?.status !== 'active') throw new Error('token-not-active')
+  const groups = await get('/permission_groups')
+  if (!Array.isArray(groups) || groups.length > 10000) throw new Error('invalid-permission-groups')
+  const sanitized = groups.map((g: any) => {
+    if (!g || !/^[a-f0-9]{32}$/.test(g.id) || typeof g.name !== 'string' || !/^[\w .:()/-]{1,120}$/.test(g.name) || g.name.includes(credential) || !Array.isArray(g.scopes) || g.scopes.length > 20 || g.scopes.some((v: unknown) => typeof v !== 'string' || !/^[\w.*-]{1,160}$/.test(v) || v.includes(credential))) throw new Error('invalid-permission-group')
+    return { id: g.id, name: g.name, scopes: g.scopes, selectable: g.is_selectable === true }
+  })
+  const fd = openSync(output, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
+  try { writeFileSync(fd, JSON.stringify({ schema: 'account-token-permissions/v1', groups: sanitized }) + '\n') } finally { closeSync(fd) }
+  return sanitized.length
+}
+
 async function main(): Promise<void> {
   if (process.argv.length === 3 && process.argv[2] === '--help') {
-    console.log('Usage: zix-cloudflare-token /absolute/private/config.json\nCreates one candidate secret. The provisioning token is read invisibly from a terminal.')
+    console.log('Usage: zix-cloudflare-token /absolute/private/config.json\n       zix-cloudflare-token --inspect /absolute/private/config.json /absolute/private/result.json\nReads the provisioning token invisibly from a terminal.')
+    return
+  }
+  if (process.argv.length === 5 && process.argv[2] === '--inspect') {
+    const config = configuration(process.argv[3])
+    const credential = await secretFromTerminal()
+    const count = await inspectAccount(config.request.accountId, credential, process.argv[4])
+    console.log(JSON.stringify({ state: 'inspection-complete', groups: count, effectivePermissions: 'not-verified' }))
     return
   }
   if (process.argv.length !== 3) throw new Error('usage')
