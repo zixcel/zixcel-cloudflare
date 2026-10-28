@@ -22,6 +22,14 @@
     "./edge-verification": {
       "types": "./dist/edge-verification.d.mts",
       "import": "./dist/edge-verification.mjs"
+    },
+    "./account-token-provisioning": {
+      "types": "./dist/account-token-provisioning.d.mts",
+      "import": "./dist/account-token-provisioning.mjs"
+    },
+    "./github-environment-secret": {
+      "types": "./dist/github-environment-secret.d.mts",
+      "import": "./dist/github-environment-secret.mjs"
     }
   },
   "repository": {
