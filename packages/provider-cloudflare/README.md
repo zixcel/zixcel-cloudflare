@@ -84,3 +84,27 @@ scripts, moved tags and changed body bytes must still fail the caller's exact
 artifact hash check. This is not a signature/trust verdict, sanitization, script
 execution or permission to weaken Cloudflare protection. Pins are explicit owner
 review inputs; never learn/approve them automatically from live responses.
+
+## Account token provisioning (new source behavior)
+
+`@zixcel/provider-cloudflare/account-token-provisioning` creates one account-owned
+API token using a caller-reviewed policy and sends its one-time value only to a
+trusted callback. It returns a token ID and status, never the credential or API
+error body. It does not validate that a policy grants minimum access, verify
+remote permissions, or retry an uncertain request. A failed sink causes a best
+effort revocation of the new token; inspect `ProvisioningError.recovery` and the
+new token ID before any further action. There is no automatic cleanup of old
+tokens. The caller must review account, permission groups and resource scope.
+
+`@zixcel/provider-cloudflare/github-environment-secret` supplies a trusted local
+GitHub CLI callback. It accepts only secret names ending in `_CANDIDATE`, sends
+the value on stdin with no shell, suppresses subprocess output and requires the
+caller to provide an already authenticated, trusted `gh`. A candidate must be
+verified before any production secret is changed. A timeout is an uncertain
+write; do not assume the candidate was absent. These exports are not an
+end-to-end deployment workflow or a credential prompt. No token, target account,
+repository or policy is configured by this package.
+
+Unit tests use only fabricated data and a fake local secret-store command. Actual
+Cloudflare policy support, the candidate's effective access and production GitHub
+Environment behavior require separate acceptance testing.
