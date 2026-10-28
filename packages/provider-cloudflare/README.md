@@ -128,3 +128,9 @@ or deployment success. A failed or uncertain create or upload is not retried;
 inspect the returned recovery state and reconcile manually. Do not delete or
 replace any existing production credential until the candidate is independently
 verified. Current tests use fake credentials and never reach real providers.
+
+For read-only preflight, `zix-cloudflare-token --inspect CONFIG OUTPUT` verifies
+the entered account token and lists account token permission-group metadata. The
+output must not exist, and its parent must be an owner-only directory. The
+command creates the metadata file with mode 0600; the credential is not saved.
+A selectable group is not proof of a specific Worker's effective access.
