@@ -2,11 +2,11 @@
   "schema": "zix-native-policy/v1",
   "namespace": "cloudflare",
   "package": "zixcel-cloudflare-cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "credential_environment": "ZIX_CLOUDFLARE_ACCESS_TOKEN",
   "origin": "https://api.cloudflare.com",
   "base_path": "/client/v4",
-  "routes_sha256": "adfbc10afef4d1aa4a8c5b8dd91c3a911c372139f6d1819b2b4f1ec650f9bb4a",
+  "routes_sha256": "d0c879baafd7551457f477a19226993ed8852e30787fa3bafab419320bea331f",
   "operations": [
     {
       "api": "accounts-account-details",
@@ -89,6 +89,96 @@
         },
         "required": [
           "id"
+        ],
+        "success_pointer": "/success"
+      }
+    },
+    {
+      "path_arguments": {
+        "account_id": "account"
+      },
+      "argument_rules": {
+        "account": "hex32"
+      },
+      "headers": {},
+      "identity": [],
+      "api": "account-api-tokens-verify-token",
+      "command": {
+        "id": "token.account.verify",
+        "words": [
+          "token",
+          "account",
+          "verify"
+        ],
+        "effect": "read",
+        "description": "Verify the selected account API token.",
+        "required_permissions": [],
+        "arguments": [
+          {
+            "name": "account",
+            "required": true,
+            "maximum": 32
+          }
+        ]
+      },
+      "query": {},
+      "projection": {
+        "pointer": "/result",
+        "collection": false,
+        "fields": {
+          "status": "/status"
+        },
+        "required": [
+          "status"
+        ],
+        "success_pointer": "/success"
+      }
+    },
+    {
+      "path_arguments": {
+        "account_id": "account"
+      },
+      "argument_rules": {
+        "account": "hex32"
+      },
+      "headers": {},
+      "identity": [],
+      "api": "account-api-tokens-list-permission-groups",
+      "command": {
+        "id": "token.account.permission-groups",
+        "words": [
+          "token",
+          "account",
+          "permission-groups"
+        ],
+        "effect": "read",
+        "description": "Read the first bounded page of account token permission groups.",
+        "required_permissions": [
+          "Account API Tokens Read or Write"
+        ],
+        "arguments": [
+          {
+            "name": "account",
+            "required": true,
+            "maximum": 32
+          }
+        ]
+      },
+      "query": {
+        "page": "1",
+        "per_page": "100"
+      },
+      "projection": {
+        "pointer": "/result",
+        "collection": true,
+        "fields": {
+          "id": "/id",
+          "name": "/name",
+          "selectable": "/is_selectable"
+        },
+        "required": [
+          "id",
+          "name"
         ],
         "success_pointer": "/success"
       }
