@@ -108,3 +108,23 @@ repository or policy is configured by this package.
 Unit tests use only fabricated data and a fake local secret-store command. Actual
 Cloudflare policy support, the candidate's effective access and production GitHub
 Environment behavior require separate acceptance testing.
+
+### Local candidate command (new source behavior)
+
+The package exposes `zix-cloudflare-token /absolute/private/config.json` on Node
+24. The JSON file contains exactly `request` and `target`: `request` is the
+`TokenRequest` for `provisionAccountToken`, and `target` contains `repository`,
+`environment`, and `secretName` for `githubEnvironmentSecretSink`. The secret
+name must end in `_CANDIDATE`. The file must be an owner-owned regular file with
+no group/other permissions and cannot be a symlink or hard link. It must not
+contain a credential. Policy resource syntax and permissions must be checked
+against the live provider and reviewed by the operator before use.
+
+The command accepts no token argument or token file. It requires a terminal and
+reads the bootstrap credential without echo; interruption cancels input before
+any network request. Only use it in a trusted local terminal with a trusted,
+authenticated GitHub CLI. Candidate storage is not evidence of effective access
+or deployment success. A failed or uncertain create or upload is not retried;
+inspect the returned recovery state and reconcile manually. Do not delete or
+replace any existing production credential until the candidate is independently
+verified. Current tests use fake credentials and never reach real providers.
