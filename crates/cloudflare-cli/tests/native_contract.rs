@@ -81,3 +81,39 @@ fn actual_native_manifest_and_missing_credential_protocol_need_no_node_or_accoun
     assert_eq!(response["error"], "credential_missing");
     assert!(response.get("result").is_none());
 }
+
+#[test]
+fn token_reads_are_account_scoped_and_project_only_selected_metadata() {
+    let provider = zixcel_cloudflare_cli::provider().unwrap();
+    for (operation, suffix, body) in [
+        (
+            "token.account.verify",
+            "/tokens/verify",
+            json!({"status":"active","value":"fixture-secret"}),
+        ),
+        (
+            "token.account.permission-groups",
+            "/tokens/permission_groups?page=1&per_page=100",
+            json!([{"id":"a".repeat(32),"name":"Example Read","is_selectable":true,"value":"fixture-secret"}]),
+        ),
+    ] {
+        let request: Request = serde_json::from_value(json!({"schema":"zix-provider/v1","id":"0".repeat(32),
+            "operation":operation,"arguments":{"account":"a".repeat(32)},"limits":{"timeout_ms":5000,"maximum_response_bytes":65536}})).unwrap();
+        let url = provider.prepare(&request).unwrap().url;
+        assert!(url.ends_with(suffix), "{url}");
+        let projection = provider
+            .project(
+                &request,
+                &serde_json::to_vec(&json!({"success":true,"result":body})).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(projection["permission_state"], "not_inferred");
+        assert_eq!(projection["completeness"], "single_response");
+        assert!(!projection.to_string().contains("fixture-secret"));
+        let mut wrong = request.clone();
+        wrong
+            .arguments
+            .insert("account".into(), "../../other".into());
+        assert!(provider.prepare(&wrong).is_err());
+    }
+}

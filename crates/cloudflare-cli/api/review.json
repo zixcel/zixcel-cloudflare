@@ -10,6 +10,14 @@
     {
       "id": "accounts-list-accounts",
       "binding": null
+    },
+    {
+      "id": "account-api-tokens-verify-token",
+      "binding": null
+    },
+    {
+      "id": "account-api-tokens-list-permission-groups",
+      "binding": null
     }
   ],
   "source_uri": "https://raw.githubusercontent.com/cloudflare/api-schemas/e91e65be9898b6bc400231f36ce77e8e7d5a02ab/openapi.json"

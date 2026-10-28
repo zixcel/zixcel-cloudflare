@@ -222,5 +222,89 @@
     "documentation": [
       "https://developers.cloudflare.com/fundamentals/api/reference/permissions/"
     ]
+  },
+  {
+    "operation": "token.account.verify",
+    "selectors": {},
+    "intent": "verify_selected_account_api_token",
+    "keywords": [
+      "CLOUDFLARE",
+      "TOKEN",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "An account-owned API token for the selected account",
+        "subject": "operation"
+      },
+      {
+        "kind": "context",
+        "value": "Single response; permission and inventory completeness are not inferred",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/how-to/create-via-api/"
+    ]
+  },
+  {
+    "operation": "token.account.permission-groups",
+    "selectors": {},
+    "intent": "inspect_first_account_token_permission_groups",
+    "keywords": [
+      "CLOUDFLARE",
+      "TOKEN",
+      "READ"
+    ],
+    "requirements": [
+      {
+        "kind": "audience",
+        "value": "https://api.cloudflare.com",
+        "subject": "cloudflare_credential"
+      },
+      {
+        "kind": "provider_permission",
+        "value": "Account API Tokens Read or Write",
+        "subject": "operation"
+      },
+      {
+        "kind": "context",
+        "value": "Single response; permission and inventory completeness are not inferred",
+        "subject": "operation"
+      }
+    ],
+    "next_actions": [
+      {
+        "namespace": "credential",
+        "operation": "help",
+        "purpose": "inspect_secure_credential_usage",
+        "arguments": {},
+        "on": [
+          "context",
+          "authentication"
+        ]
+      }
+    ],
+    "documentation": [
+      "https://developers.cloudflare.com/fundamentals/api/how-to/create-via-api/"
+    ]
   }
 ]

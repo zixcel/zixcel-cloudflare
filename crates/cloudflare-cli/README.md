@@ -27,3 +27,12 @@ Native release/tag protection and distribution remain separate acceptance work.
 Owner CI also prepares a static musl candidate with dependency notices, source
 record and archive/contents hashes. CI artifacts are review candidates, not a
 GitHub Release; no tag or publishing permission is added by this workflow.
+
+Source adds `zix cloudflare token account verify --account …` and
+`zix cloudflare token account permission-groups --account …`. These are bounded
+reads and can be invoked through the registered `zix credential run` boundary
+with a matching Crowsi custody reference and reviewed executable/manifest hashes.
+The permission-group operation reads only the first page and cannot prove that
+all groups are visible or that a permission applies to a specific resource. Token
+verification reports state only; neither operation publishes a token or changes an
+account. Synthetic tests do not establish actual-account access or a released binary.

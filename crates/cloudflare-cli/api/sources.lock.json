@@ -9,10 +9,12 @@
   "input_format": "openapi",
   "reference_sources": {},
   "selected_api_ids": [
+    "account-api-tokens-list-permission-groups",
+    "account-api-tokens-verify-token",
     "accounts-account-details",
     "accounts-list-accounts"
   ],
-  "routes_sha256": "adfbc10afef4d1aa4a8c5b8dd91c3a911c372139f6d1819b2b4f1ec650f9bb4a",
+  "routes_sha256": "d0c879baafd7551457f477a19226993ed8852e30787fa3bafab419320bea331f",
   "compiler_repository": "https://github.com/zixcel/cli",
   "compiler_revision": "c0d0c04eaa17b55491144a52d918810baf2f53a6",
   "redistributed_content": "interface facts only; no upstream prose, examples or schema bodies"
