@@ -63,7 +63,7 @@ async function inspectAccount(accountId: string, credential: string, output: str
   const groups = await get('/permission_groups')
   if (!Array.isArray(groups) || groups.length > 10000) throw new Error('invalid-permission-groups')
   const sanitized = groups.map((g: any) => {
-    if (!g || !/^[a-f0-9]{32}$/.test(g.id) || typeof g.name !== 'string' || !/^[\w .:()/-]{1,120}$/.test(g.name) || g.name.includes(credential) || !Array.isArray(g.scopes) || g.scopes.length > 20 || g.scopes.some((v: unknown) => typeof v !== 'string' || !/^[\w.*-]{1,160}$/.test(v) || v.includes(credential))) throw new Error('invalid-permission-group')
+    if (!g || !/^[a-f0-9]{32}$/.test(g.id) || typeof g.name !== 'string' || g.name.length < 1 || g.name.length > 160 || /[\x00-\x1f\x7f]/.test(g.name) || g.name.includes(credential) || !Array.isArray(g.scopes) || g.scopes.length > 20 || g.scopes.some((v: unknown) => typeof v !== 'string' || !/^[\w.*-]{1,160}$/.test(v) || v.includes(credential))) throw new Error('invalid-permission-group')
     return { id: g.id, name: g.name, scopes: g.scopes, selectable: g.is_selectable === true }
   })
   const fd = openSync(output, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
