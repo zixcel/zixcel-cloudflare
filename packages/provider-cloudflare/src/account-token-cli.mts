@@ -44,7 +44,7 @@ async function secretFromTerminal(): Promise<string> {
   })
 }
 
-async function inspectAccount(accountId: string, credential: string, output: string): Promise<number> {
+async function inspectAccount(accountId: string, credential: string, output: string): Promise<{ count: number; complete: boolean }> {
   if (!/^[a-f0-9]{32}$/.test(accountId) || !isAbsolute(output)) throw new Error('invalid-inspection')
   const dir = lstatSync(dirname(output))
   if (!dir.isDirectory() || dir.isSymbolicLink() || dir.uid !== process.getuid?.() || (dir.mode & 0o077) !== 0) throw new Error('invalid-output-directory')
@@ -56,19 +56,33 @@ async function inspectAccount(accountId: string, credential: string, output: str
     if (Buffer.byteLength(body) > 2097152) throw new Error('inspection-response-too-large')
     const payload = JSON.parse(body)
     if (payload?.success !== true) throw new Error('inspection-rejected')
-    return payload.result
+    return payload
   }
-  const verified = await get('/verify')
+  const verified = (await get('/verify')).result
   if (verified?.status !== 'active') throw new Error('token-not-active')
-  const groups = await get('/permission_groups')
-  if (!Array.isArray(groups) || groups.length > 10000) throw new Error('invalid-permission-groups')
+  const groups: any[] = []
+  let complete = false
+  let expectedTotal: number | undefined
+  for (let page = 1; page <= 100; page++) {
+    const response = await get(`/permission_groups?page=${page}&per_page=100`)
+    if (!Array.isArray(response.result) || response.result.length > 100 || groups.length + response.result.length > 10000) throw new Error('invalid-permission-groups')
+    groups.push(...response.result)
+    const info = response.result_info
+    if (!info || !Number.isSafeInteger(info.total_count) || !Number.isSafeInteger(info.page) || !Number.isSafeInteger(info.per_page) || info.page !== page || info.per_page < 1 || info.per_page > 100) break
+    if (info.total_count < 0 || info.total_count > 10000 || (expectedTotal !== undefined && expectedTotal !== info.total_count)) throw new Error('unstable-permission-groups')
+    expectedTotal = info.total_count
+    if (groups.length === info.total_count) { complete = true; break }
+    if (groups.length > info.total_count) throw new Error('invalid-permission-groups')
+    if (response.result.length === 0) break
+  }
   const sanitized = groups.map((g: any) => {
     if (!g || !/^[a-f0-9]{32}$/.test(g.id) || typeof g.name !== 'string' || g.name.length < 1 || g.name.length > 160 || /[\x00-\x1f\x7f]/.test(g.name) || g.name.includes(credential) || !Array.isArray(g.scopes) || g.scopes.length > 20 || g.scopes.some((v: unknown) => typeof v !== 'string' || !/^[\w.*-]{1,160}$/.test(v) || v.includes(credential))) throw new Error('invalid-permission-group')
     return { id: g.id, name: g.name, scopes: g.scopes, selectable: g.is_selectable === true }
   })
+  if (new Set(sanitized.map((g: { id: string }) => g.id)).size !== sanitized.length) throw new Error('duplicate-permission-group')
   const fd = openSync(output, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
-  try { writeFileSync(fd, JSON.stringify({ schema: 'account-token-permissions/v1', groups: sanitized }) + '\n') } finally { closeSync(fd) }
-  return sanitized.length
+  try { writeFileSync(fd, JSON.stringify({ schema: 'account-token-permissions/v1', complete, groups: sanitized }) + '\n') } finally { closeSync(fd) }
+  return { count: sanitized.length, complete }
 }
 
 async function main(): Promise<void> {
@@ -79,8 +93,8 @@ async function main(): Promise<void> {
   if (process.argv.length === 5 && process.argv[2] === '--inspect') {
     const config = configuration(process.argv[3])
     const credential = await secretFromTerminal()
-    const count = await inspectAccount(config.request.accountId, credential, process.argv[4])
-    console.log(JSON.stringify({ state: 'inspection-complete', groups: count, effectivePermissions: 'not-verified' }))
+    const inventory = await inspectAccount(config.request.accountId, credential, process.argv[4])
+    console.log(JSON.stringify({ state: 'inspection-complete', groups: inventory.count, inventoryComplete: inventory.complete, effectivePermissions: 'not-verified' }))
     return
   }
   if (process.argv.length !== 3) throw new Error('usage')

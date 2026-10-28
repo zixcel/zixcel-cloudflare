@@ -45,11 +45,11 @@ test('inspection performs bounded reads and writes private metadata without the 
   try {
     const config = join(dir,'plan.json'), output = join(dir,'groups.json'), fixture = join(dir,'fetch.mjs')
     await writeFile(config, JSON.stringify({request:{accountId:'a'.repeat(32),name:'fixture',policies:[]},target:{repository:'fixture/repo',environment:'production',secretName:'TOKEN_CANDIDATE'}}), {mode:0o600})
-    await writeFile(fixture, `globalThis.fetch=async(url,init)=>{if(init.method || init.headers.Authorization!=='Bearer synthetic-private-value')throw Error('fixture failure');return new Response(JSON.stringify({success:true,result:url.endsWith('/verify')?{status:'active'}:[{id:'b'.repeat(32),name:'Workers Read',scopes:['com.cloudflare.api.account'],is_selectable:true}]}))}`)
+    await writeFile(fixture, `globalThis.fetch=async(url,init)=>{if(init.method || init.headers.Authorization!=='Bearer synthetic-private-value')throw Error('fixture failure');return new Response(JSON.stringify({success:true,result:url.endsWith('/verify')?{status:'active'}:[{id:'b'.repeat(32),name:'Workers Read',scopes:['com.cloudflare.api.account'],is_selectable:true}],result_info:{total_count:1,page:1,per_page:100}}))}`)
     const code = `import os,pty,select,sys,time\npid,fd=pty.fork()\nif pid==0:os.execv(sys.argv[1],[sys.argv[1],'--import',sys.argv[2],sys.argv[3],'--inspect',sys.argv[4],sys.argv[5]])\nb=b'';end=time.monotonic()+5\nwhile b'input hidden' not in b and time.monotonic()<end:\n r,_,_=select.select([fd],[],[],0.2)\n if r:\n  try:b+=os.read(fd,4096)\n  except OSError:break\nif b'input hidden' not in b:os.kill(pid,9);sys.exit(2)\nos.write(fd,b'synthetic-private-value\\n')\nwhile time.monotonic()<end:\n r,_,_=select.select([fd],[],[],0.2)\n if r:\n  try:b+=os.read(fd,4096)\n  except OSError:break\n_,status=os.waitpid(pid,0)\nsys.exit(0 if b'synthetic-private-value' not in b and os.waitstatus_to_exitcode(status)==0 else 3)`
     const result = spawnSync('python3',['-c',code,process.execPath,fixture,cli,config,output],{encoding:'utf8',timeout:7000})
     assert.equal(result.status,0,`fixture failed: ${result.status}`)
     const bytes = await readFile(output,'utf8'); assert.doesNotMatch(bytes,/synthetic-private-value/)
-    assert.equal(JSON.parse(bytes).groups[0].selectable,true); assert.equal((await stat(output)).mode & 0o777,0o600)
+    assert.equal(JSON.parse(bytes).groups[0].selectable,true); assert.equal(JSON.parse(bytes).complete,true); assert.equal((await stat(output)).mode & 0o777,0o600)
   } finally { await rm(dir,{recursive:true,force:true}) }
 })
