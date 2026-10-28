@@ -16,6 +16,6 @@
   ],
   "routes_sha256": "d0c879baafd7551457f477a19226993ed8852e30787fa3bafab419320bea331f",
   "compiler_repository": "https://github.com/zixcel/cli",
-  "compiler_revision": "c0d0c04eaa17b55491144a52d918810baf2f53a6",
+  "compiler_revision": "a59030009eaf5e8ee80f04753ea222d47a21de0b",
   "redistributed_content": "interface facts only; no upstream prose, examples or schema bodies"
 }
