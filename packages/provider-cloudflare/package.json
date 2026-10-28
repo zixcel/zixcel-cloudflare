@@ -62,5 +62,8 @@
     "api-client",
     "automation",
     "typescript"
-  ]
+  ],
+  "bin": {
+    "zix-cloudflare-token": "./dist/account-token-cli.mjs"
+  }
 }
